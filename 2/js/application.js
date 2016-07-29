@@ -39,8 +39,6 @@ d3.select("body")
       view;
 
   function genderColor(d) {
-    console.log(d);
-    console.log(d.object.funcionario.genero);
     if (d.object.funcionario.genero == 'F') {
       // hsla(343, 100%, 58%, 1)
       return 'hsl(343, 100%,' + saturationDepthPink(d.depth) + '%)';
@@ -58,6 +56,9 @@ d3.select("body")
     .enter().append("circle")
     .attr("class", function(d) { return d.parent ? d.children ? "node" : "node node--leaf" : "node node--root"; })
     .style("fill", function(d) { return d.children ? genderColor(d) : null; })
+    .attr('id', function (d) { return 'circle-' + d.object.id; })
+    .on('mouseover', circleMouseOver)
+    .on('mouseout', circleMouseOut)
     .on("click", function(d) { if (focus !== d) zoom(d), d3.event.stopPropagation(); });
 
   var text = svg.selectAll("text")
@@ -65,9 +66,38 @@ d3.select("body")
     .enter()
     .append("text")
     .attr("class", "label")
+    .attr('id', function (d) { return 'text-' + d.object.id; })
     .style("fill-opacity", function(d) { return d.parent === root ? 1 : 0; })
     .style("display", function(d) { return d.parent === root ? "inline" : "none"; })
-    .text(function(d) { return d.name; });
+    .text(function(d) { return d.name; });var defs= svg.append('defs')
+
+
+  // defs.append('pattern')
+  //   .attr('id', 'pic-1')
+  //   .attr('patternUnits', 'userSpaceOnUse')
+  //   .attr('width', 115.5)
+  //   .attr('height', 100)
+  //   .append('svg:image')
+  //   .attr('xlink:href', 'http://cammac7.github.io/img/portfolio/BLM.png')
+  //   .attr("width", 115.5)
+  //   .attr("height", 100)
+  //   .attr("x", 0)
+  //   .attr("y", 0);
+
+var defs = circle
+    .append('defs')
+    .append('pattern')
+    .attr('id', function(d) { return 'pic-' + d.object.id; })
+    .attr('patternUnits', 'userSpaceOnUse')
+    .attr('width', 115.5)
+    .attr('height', 100)
+    .append('svg:image')
+    //.attr('xlink:href', function(d) { console.log(d.object.funcionario.foto.thumbnail); return d.object.funcionario.foto.thumbnail; })
+    .attr('xlink:href','http://cammac7.github.io/img/portfolio/BLM.png')
+    .attr("width", 115.5)
+    .attr("height", 100)
+    .attr("x", 0)
+    .attr("y", 0);
 
   var node = svg.selectAll("circle,text");
 
@@ -96,5 +126,24 @@ d3.select("body")
     circle.attr("r", function(d) { return d.r * k; });
   }
 
-d3.select(self.frameElement).style("height", diameter + "px");
+  function circleMouseOver (d) {
+    d3.select(this)
+      .style("fill", "url(#pic-"+ d.object.id +")");
+    // d3.select(this)
+    //   .style("fill", "url(#pic-1)");
+    d3.select('#text-' + d.object.id)
+      .text(function(d){
+          return d.object.cargo.categoria.nombre;
+      })
+  }
+
+  function circleMouseOut (d) {
+    // d3.select(this)
+    //   .style("fill", "url(" +  d.funcionario.foto.thumbnail + ")");
+    d3.select('#text-' + d.object.id)
+      .text(function(d){
+          return d.name;
+      })
+  }
+  d3.select(self.frameElement).style("height", diameter + "px");
 }

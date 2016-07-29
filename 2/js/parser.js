@@ -17,8 +17,6 @@ $( document ).ready(function() {
   	depth = 1;
   	searchDependencies(firstElem.id, data, depth);
   	console.log(data);
-  	// console.log(count);
-  	// console.log(depth);
   	draw(data);
   });
 });
